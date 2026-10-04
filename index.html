@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReelCaption Studio — Viral captions & on-screen typography</title>
+  <meta name="description" content="Generate viral captions, CTAs, hashtags and animated on-screen typography for Reels, TikTok and Shorts. Export black & green screen overlays." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@900&family=Noto+Sans+Gujarati:wght@900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">RC</div>
+      <div>
+        <h1>ReelCaption <span>Studio</span></h1>
+        <p>Captions · CTAs · Hashtags · Viral on-screen text</p>
+      </div>
+    </div>
+    <button id="settingsBtn" class="btn ghost" type="button">
+      <span class="dot" id="aiDot"></span> AI settings
+    </button>
+  </header>
+
+  <main class="layout">
+    <section class="col-left">
+      <!-- INPUT -->
+      <div class="card">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-mode="A" role="tab" type="button">Mode A · Topic</button>
+          <button class="tab" data-mode="B" role="tab" type="button">Mode B · Media</button>
+        </div>
+
+        <div class="mode-panel" id="modeA">
+          <label class="field">
+            <span>Topic or idea</span>
+            <textarea id="topic" rows="3" placeholder="e.g. Morning gym routine · Navratri garba night · Aaj no divas bau j mast che"></textarea>
+          </label>
+        </div>
+
+        <div class="mode-panel hidden" id="modeB">
+          <div class="drop" id="drop">
+            <input type="file" id="mediaFile" accept="video/mp4,video/quicktime,video/x-matroska,video/webm,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a,audio/aac,.mp4,.mov,.mkv,.webm,.mp3,.wav,.m4a,.aac" hidden />
+            <div class="drop-inner">
+              <strong>Drop video / audio here</strong>
+              <span>mp4 · mov · mkv · webm · mp3 · wav · m4a · aac</span>
+              <button class="btn small" type="button" id="pickFile">Choose file</button>
+            </div>
+            <div class="file-name" id="fileName"></div>
+          </div>
+
+          <label class="field">
+            <span>Or paste a YouTube / TikTok / Instagram link</span>
+            <input id="mediaLink" type="url" placeholder="https://..." />
+          </label>
+
+          <label class="field">
+            <span>Transcript <em>(timestamps optional: “0.00–1.10 text”, “[0:05] text” or SRT)</em></span>
+            <textarea id="transcript" rows="6" placeholder="Paste the spoken words here…"></textarea>
+          </label>
+          <div class="row">
+            <button class="btn" type="button" id="transcribeBtn">Transcribe file with AI (Whisper)</button>
+            <span class="hint" id="transcribeHint"></span>
+          </div>
+        </div>
+
+        <div class="grid4">
+          <label class="field">
+            <span>Language</span>
+            <select id="lang">
+              <option value="auto">Auto-detect</option>
+              <option value="en">English</option>
+              <option value="hi">Hindi (देवनागरी)</option>
+              <option value="gu">Gujarati (ગુજરાતી)</option>
+              <option value="hinglish">Hinglish</option>
+              <option value="gujlish">Gujlish</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Tone</span>
+            <select id="tone">
+              <option value="auto">Auto</option>
+              <option value="funny">Funny</option>
+              <option value="savage">Savage</option>
+              <option value="motivational">Motivational</option>
+              <option value="emotional">Emotional</option>
+              <option value="roast">Roast</option>
+              <option value="storytelling">Storytelling</option>
+              <option value="informative">Informative</option>
+              <option value="trendy">Trendy</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Text position</span>
+            <select id="position">
+              <option value="lower">Lower third (face-safe)</option>
+              <option value="center">Centre</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Money-word colour</span>
+            <select id="hlColor">
+              <option value="auto">Auto (by tone)</option>
+              <option value="yellow">Yellow #FFE500</option>
+              <option value="red">Red #FF2D2D</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="row end">
+          <label class="check"><input type="checkbox" id="useAI" /> Use AI (needs API key)</label>
+          <button class="btn primary" type="button" id="generateBtn">Generate</button>
+        </div>
+        <div class="alert hidden" id="alert"></div>
+      </div>
+
+      <!-- OUTPUT -->
+      <div class="card hidden" id="outputCard">
+        <div class="card-head">
+          <h2>Output</h2>
+          <div class="chips" id="chips"></div>
+          <div class="spacer"></div>
+          <button class="btn small ghost" type="button" id="regenBtn">↻ New variant</button>
+          <button class="btn small" type="button" id="copyAll">Copy all</button>
+        </div>
+
+        <div class="out-block">
+          <div class="out-label"><b>1</b> Caption <button class="copy" data-copy="outCaption" type="button">Copy</button></div>
+          <div class="out-text" id="outCaption" contenteditable="true" spellcheck="false"></div>
+        </div>
+        <div class="out-block">
+          <div class="out-label"><b>2</b> CTA <button class="copy" data-copy="outCta" type="button">Copy</button></div>
+          <div class="out-text" id="outCta" contenteditable="true" spellcheck="false"></div>
+        </div>
+        <div class="out-block">
+          <div class="out-label"><b>3</b> #Hashtags <button class="copy" data-copy="outTags" type="button">Copy</button></div>
+          <div class="out-text tags" id="outTags" contenteditable="true" spellcheck="false"></div>
+        </div>
+        <div class="out-block">
+          <div class="out-label"><b>4</b> Emojis <button class="copy" data-copy="outEmojis" type="button">Copy</button></div>
+          <div class="out-text emojis" id="outEmojis" contenteditable="true" spellcheck="false"></div>
+        </div>
+      </div>
+
+      <!-- ON-SCREEN -->
+      <div class="card hidden" id="cuesCard">
+        <div class="card-head">
+          <h2>On-screen typography</h2>
+          <div class="spacer"></div>
+          <button class="btn small ghost" type="button" id="addCue">+ Add line</button>
+          <button class="btn small" type="button" id="downloadSrt">Download .srt</button>
+        </div>
+        <p class="hint">Wrap the money word in <code>*stars*</code> to highlight it. 2–4 words per screen (max 6).</p>
+        <div class="cue-table" id="cueTable"></div>
+      </div>
+    </section>
+
+    <!-- PREVIEW -->
+    <aside class="col-right">
+      <div class="card sticky">
+        <div class="card-head">
+          <h2>Preview <small>1080×1920 · 30fps</small></h2>
+        </div>
+        <div class="phone">
+          <canvas id="preview" width="1080" height="1920"></canvas>
+        </div>
+        <div class="player">
+          <button class="btn icon" id="playBtn" type="button" aria-label="Play">▶</button>
+          <input type="range" id="scrub" min="0" max="1000" value="0" />
+          <span class="time" id="timeLabel">0.00s</span>
+        </div>
+        <div class="seg" id="bgSeg">
+          <button class="active" data-bg="black" type="button">Black</button>
+          <button data-bg="green" type="button">Green</button>
+          <button data-bg="footage" type="button" id="footageBtn" disabled>My footage</button>
+        </div>
+        <label class="check"><input type="checkbox" id="safeToggle" /> Show safe zones (70px sides · 320px bottom)</label>
+
+        <div class="export">
+          <button class="btn export-black" id="exportBlack" type="button" disabled>⬇ Black screen video</button>
+          <button class="btn export-green" id="exportGreen" type="button" disabled>⬇ Green screen video</button>
+        </div>
+        <div class="progress hidden" id="progress"><div id="progressBar"></div><span id="progressText"></span></div>
+        <p class="hint small" id="exportHint">Export renders in real time — keep this tab open and visible.</p>
+      </div>
+    </aside>
+  </main>
+
+  <dialog id="settings">
+    <form method="dialog" class="dialog">
+      <h2>AI settings <small>(optional)</small></h2>
+      <p class="hint">Without a key, the built-in template engine is used. With an OpenAI key you get AI-written captions and Whisper transcription with word-level timestamps. The key is stored only in this browser.</p>
+      <label class="field">
+        <span>OpenAI API key</span>
+        <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
+      </label>
+      <label class="field">
+        <span>Chat model</span>
+        <input id="apiModel" type="text" placeholder="gpt-4o-mini" />
+      </label>
+      <div class="row end">
+        <button class="btn ghost" value="clear" id="clearKey" type="button">Clear key</button>
+        <button class="btn primary" value="save" id="saveKey">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/templates.js"></script>
+  <script src="js/generator.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
